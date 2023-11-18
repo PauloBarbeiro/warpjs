@@ -25,11 +25,7 @@ export default class Warp
 			const pathString = getProperty(pathElement, 'd')
 			const pathData = pathParser(pathString)
 
-			return {
-				pathElement,
-				pathData,
-				initialData: this.baseOriginal ? pathData : undefined
-			}
+			return { pathElement, pathData }
 		})
 	}
 
@@ -57,6 +53,11 @@ export default class Warp
 	lockOriginal()
 	{
 		this.baseOriginal = true
+
+		for (let path of this.paths)
+		{
+			path.initialData = path.pathData.map(d => Object.assign({}, d))
+		}
 	}
 
 	interpolate(threshold)
