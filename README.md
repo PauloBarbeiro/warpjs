@@ -55,6 +55,9 @@ Using this concept of extending coordinates, you could use it to store velocity,
 
 ## API
 
+### `lockOriginal()`
+Keeps the original SVG path in memory, and uses this data in the future transformation. It facilitates transformations to be performed in one direction, and not loose path's information. This is an OPTIONAL method, but to work it must be called before any operation.
+
 ### `transform(transformer | [transformer...])`
 Applies a transformation (or array of transformers) to all points on the SVG. This method accepts a function for transforming the points in the SVG. The function will be passed a single argument – a coordinate array, with the first two indices containing the `x` and `y` values of that point. The function must return a coordinate array with at least two values, but it may also return more. If more values are returned than what was supplied, then that vector will be extended with those new values, and subsequent calls to `transform()` will supply these new values.
 

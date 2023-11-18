@@ -12,6 +12,8 @@ export default class Warp
 	constructor(element, curveType='q')
 	{
 		this.element = element
+		/** Whether to base transformations on original path's data */
+		this.baseOriginal = false
 
 		shapesToPaths(element)
 		preparePaths(element, curveType)
@@ -23,7 +25,11 @@ export default class Warp
 			const pathString = getProperty(pathElement, 'd')
 			const pathData = pathParser(pathString)
 
-			return { pathElement, pathData }
+			return {
+				pathElement,
+				pathData,
+				initialData: this.baseOriginal ? pathData : undefined
+			}
 		})
 	}
 
@@ -42,10 +48,15 @@ export default class Warp
 
 		for (let path of this.paths)
 		{
-			path.pathData = warpTransform(path.pathData, transformers)
+			path.pathData = warpTransform(this.baseOriginal ? path.initialData : path.pathData, transformers)
 		}
 
 		this.update()
+	}
+
+	lockOriginal()
+	{
+		this.baseOriginal = true
 	}
 
 	interpolate(threshold)
@@ -68,6 +79,11 @@ export default class Warp
 		for (let path of this.paths)
 		{
 			path.pathData = warpInterpolate(path.pathData, threshold, deltaFunction)
+
+			if ( this.baseOriginal )
+			{
+				path.initialData = path.pathData.map(d => Object.assign({}, d))
+			}
 		}
 
 		return didWork
@@ -93,6 +109,11 @@ export default class Warp
 		for (let path of this.paths)
 		{
 			path.pathData = warpExtrapolate(path.pathData, threshold, deltaFunction)
+
+			if ( this.baseOriginal )
+			{
+				path.initialData = path.pathData.map(d => Object.assign({}, d))
+			}
 		}
 
 		return didWork
@@ -128,6 +149,11 @@ export default class Warp
 			const interpolated = warpInterpolate(transformed, threshold, deltaFunction)
 
 			path.pathData = warpTransform(interpolated, points => points.slice(2))
+
+			if ( this.baseOriginal )
+			{
+				path.initialData = path.pathData.map(d => Object.assign({}, d))
+			}
 		}
 
 		return didWork
@@ -163,6 +189,11 @@ export default class Warp
 			const extrapolated = warpExtrapolate(transformed, threshold, deltaFunction)
 
 			path.pathData = warpTransform(extrapolated, points => points.slice(2))
+
+			if ( this.baseOriginal )
+			{
+				path.initialData = path.pathData.map(d => Object.assign({}, d))
+			}
 		}
 
 		return didWork
