@@ -50,13 +50,25 @@ export default class Warp
 		this.update()
 	}
 
-	lockOriginal()
+	lockTransformation()
 	{
 		this.baseOriginal = true
 
 		for (let path of this.paths)
 		{
 			path.initialData = path.pathData.map(d => Object.assign({}, d))
+		}
+	}
+
+	unlockTransformation(flushCache)
+	{
+		this.baseOriginal = false
+
+		if (flushCache) {
+			for (let path of this.paths)
+			{
+				path.initialData = undefined
+			}
 		}
 	}
 
